@@ -51,68 +51,6 @@ JRV1004 is seeded with car status `MAINTENANCE` because it has the OPEN maintena
 These records are demonstration data for coursework screenshots and testing.
 
 
-## REST API v1 — actual application integration
-This version introduces a real PHP JSON API rather than only describing an API in the report.
-
-The authenticated Dashboard page calls `../api/dashboard.php` with JavaScript `fetch()` and renders the returned JSON statistics. The API therefore participates in the running application.
-
-Available read APIs:
-- `GET /car_rental/api/dashboard.php` — all authenticated staff
-- `GET /car_rental/api/cars.php` — Manager and Rental Staff; Rental Staff receives a reduced field set
-- `GET /car_rental/api/rentals.php` — Manager and Rental Staff
-- `GET /car_rental/api/maintenance.php` — Manager only
-- `GET /car_rental/api/revenue.php` — Manager only
-
-The `API Architecture` page in the application provides a live JSON demonstration. API requests reuse the authenticated PHP session and enforce server-side role checks. The service layer uses PDO/prepared application database access.
-
-This is a coursework-scale service-oriented design. An API improves separation, reuse and future extensibility, but does not by itself guarantee horizontal scalability.
-
-
-## v10 state-changing API integration
-The Transactions page is now a presentation client for the API for the core rental and maintenance workflow.
-
-Actual API-driven actions:
-- `POST /api/rentals.php` action `create` — creates a rental/customer transaction.
-- `POST /api/rentals.php` action `approve` / `reject` — Manager authorization for exceptional discounts.
-- `POST /api/rentals.php` action `complete` — returns the car and changes its state to IDLE.
-- `POST /api/maintenance.php` action `create` — creates maintenance and changes an IDLE car to MAINTENANCE.
-- `POST /api/maintenance.php` action `complete` — completes maintenance and returns the car to IDLE.
-
-The browser uses JavaScript `fetch()` and receives JSON responses. State-changing API calls require the authenticated session plus a CSRF token supplied in the `X-CSRF-Token` header. Role authorization and business rules are enforced by the API server, not trusted to JavaScript.
-
-The original `transactions.php` no longer performs these state-changing database writes directly.
-
-## v11 interface cleanup
-The REST API remains part of the implementation and continues to handle dashboard data and the core rental/maintenance transactions. The standalone API Architecture page and visible technical API labels were removed from the operational staff interface. Staff see business functions only; JavaScript calls the authenticated PHP API in the background.
-
-## v12 UI cleanup
-Decorative sidebar icons and the visible coursework footer/message were removed. Business navigation, API integration, security controls and application functions remain unchanged.
-
-## v15 simplified operational interface
-Rebuilt directly from v12. Vehicle availability, rental creation, rental records, returns, Manager approval and maintenance are presented through one Operations page. Rental Staff see only operational information permitted by their role; Manager-only controls remain protected by server-side RBAC.
-
-Manager menu: Dashboard, Operations, Reports.
-Rental Staff menu: Dashboard, Operations.
-Administrator menu: Dashboard, Administration.
-
-The API remains separated internally but the `v1` directory has been removed. Endpoints are now under `/api/`.
-
-## v16 public-page simplification
-Obsolete public pages were physically removed after their functions were consolidated. The user-facing application uses a small set of pages while backend responsibilities remain separated through the API.
-
-Primary public pages:
-- login.php
-- forgot_password.php
-- dashboard.php
-- operations.php
-- reports.php
-- administration.php
-- change_password.php
-- logout.php
-
-Additional support pages are retained only where required by an existing workflow. The API remains under `/api/` with separate dashboard, car, rental, maintenance and revenue services.
-
-
 ## Customer access update
 Rental staff may view and complete only rentals they created (rentals.requested_by).
 Managers may view and complete all rentals. This policy uses the existing creator
